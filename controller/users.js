@@ -1,5 +1,8 @@
 const UserModal = require ('../models/users');
  const bcrypt = require('bcrypt');
+ const jwt = require('jsonwebtoken');
+
+ 
 
 
 const userRegistration =  async( req, res) =>{
@@ -14,7 +17,7 @@ const userRegistration =  async( req, res) =>{
     });
 };
 const userLogin = async (req, res) => {
-     //console.log(req.body);
+     console.log(req.body);
     const user= await UserModal.findOne({email: req.body.email});
     if(!user){
         return res.json({
@@ -26,14 +29,21 @@ const userLogin = async (req, res) => {
 
  const isPasswordCorrect = bcrypt.compareSync(req.body.password, user.password);
 //  console.log(isPasswordCorrect);
- if(isPasswordCorrect){
-    return res.json({
-        success:true,
-        massage: " Logged in Success"
-    });
- };
 
-    res.json({
+if (isPasswordCorrect) {
+    const expiryTime = Math.floor(new Date().getTime() / 1000) + 3600; // 1 hour expiry from now
+    const payload = {
+        name: user.firstname,
+        role: user.role,
+        exp: expiryTime
+    };
+    const token = jwt.sign(payload, 'qwertyuioplkjhgfdsa147852369'); // Assuming JWT_SECRET is your secret key
+return res.json({
+        success: true,
+        message: 'Login with token successful',
+        token
+    });
+}res.json({
         success: false,
         massage:"Invalid username or password",
     });

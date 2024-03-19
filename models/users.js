@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save",function() {
      console.log(this.password);
-    const salt = bcrypt.genSaltSync(5);
+    const salt = bcrypt.genSaltSync(10);
     const hash =  bcrypt.hashSync(this.password, salt);
     this.password = hash;
 });
